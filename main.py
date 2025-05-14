@@ -1,5 +1,10 @@
 import math
-  
+import sqlite3
+
+connection = sqlite3.connect('products.db')
+cursor = connection.cursor()
+cursor.execute('CREATE TABLE IF NOT EXISTS products (gtin INTEGER PRIMARY KEY, name TEXT, cost FLOAT)')
+
 def iseven(num):
   if num % 2:
       return False
@@ -31,9 +36,29 @@ def checkChecksum(In):
     return True
   else:
     return False
-  
-GTIN = input("> ")
-if len(GTIN) == 7:
-    print(makeChecksum(GTIN))
-if len(GTIN) == 8:
-    print(checkChecksum(GTIN))
+
+while True:
+  command = input("> ")
+  command = command.lower()
+  if "new|" in command:
+    commandList = command.split("|")
+    GTIN = commandList[1]
+    name = commandList[2]
+    cost = float(commandList[3])
+    if len(GTIN) == 7:
+      GTIN = int(GTIN + str(makeChecksum(GTIN)))
+    if checkChecksum(str(GTIN)):
+      cursor.execute(f'INSERT INTO products VALUES ("{GTIN}", "{name}", "{cost}")')
+      connection.commit()
+      print("Commited")
+    else:
+      print("Failed GTIN Check")
+  if "list|" in command:
+    cursor.execute("SELECT * FROM products")
+    ans = cursor.fetchall()
+    for i in ans:
+      print(i)
+  if "gtin|" in command:
+    GTIN = int(commandList[1])
+    cursor.execute("SELECT * FROM products WHERE gtin = ?", (GTIN,))
+    print(cursor.fetchall())
