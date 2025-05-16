@@ -1,10 +1,6 @@
-import math
+import math, NateUtils
 
-def iseven(num):
-  if num % 2:
-      return False
-  else:
-      return True
+from click import File
 
 def makeChecksum(In):
   sum = 0
@@ -12,7 +8,7 @@ def makeChecksum(In):
   if len(In) != 7:
     return "null"
   for i in range(0,7):
-    if iseven(i):
+    if NateUtils.iseven(i):
       In[i] = int(In[i]) * 3
     else:
       In[i] = int(In[i])
@@ -39,18 +35,20 @@ while True:
     commandList = command.split("|")
     GTIN = commandList[1]
     name = commandList[2]
-    cost = float(commandList[3])
+    cost = commandList[3]
     if len(GTIN) == 7:
-      GTIN = int(GTIN + str(makeChecksum(GTIN)))
-    if checkChecksum(str(GTIN)) //todo
-
-      print("Commited")
+      GTIN = GTIN + str(makeChecksum(GTIN))
+    if checkChecksum(GTIN):
+      f = open("products.txt","a")
+      f.write(f'{GTIN}|{name}|{cost}')
+      NateUtils.print_slow("Commited")
     else:
-      print("Failed GTIN Check")
+      NateUtils.print_slow("Failed GTIN Check")
+
   if "list|" in command:
-//todo
-    for i in ans:
-      print(i)
+    '''todo'''
+
   if "gtin|" in command:
+    commandList = command.split("|")
     GTIN = int(commandList[1])
-  //todo
+    '''todo'''
