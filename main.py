@@ -40,15 +40,23 @@ while True:
       GTIN = GTIN + str(makeChecksum(GTIN))
     if checkChecksum(GTIN):
       f = open("products.txt","a")
-      f.write(f'{GTIN}|{name}|{cost}')
+      f.write(f'{GTIN}|{name}|{cost}\n')
+      f.close()
       NateUtils.print_slow("Commited")
     else:
       NateUtils.print_slow("Failed GTIN Check")
 
   if "list|" in command:
-    '''todo'''
+    f = open("products.txt","r")
+    for line in f.readlines():
+      NateUtils.print_slow(line.strip("[']\n"))
+    f.close()
 
   if "gtin|" in command:
     commandList = command.split("|")
-    GTIN = int(commandList[1])
-    '''todo'''
+    GTIN = commandList[1]
+    f = open("products.txt","r")
+    for line in f.readlines():
+      if GTIN in line.strip("[']\n"):
+        NateUtils.print_slow(line.strip("[']\n"))
+    f.close()
