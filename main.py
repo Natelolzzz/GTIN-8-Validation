@@ -1,7 +1,5 @@
 import math, NateUtils
 
-from click import File
-
 def makeChecksum(In):
   sum = 0
   In = list(In)
@@ -36,11 +34,12 @@ while True:
     GTIN = commandList[1]
     name = commandList[2]
     cost = commandList[3]
+    stock = commandList[4]
     if len(GTIN) == 7:
       GTIN = GTIN + str(makeChecksum(GTIN))
     if checkChecksum(GTIN):
       f = open("products.txt","a")
-      f.write(f'{GTIN}|{name}|{cost}\n')
+      f.write(f'{GTIN}|{name}|{cost}|{stock}\n')
       f.close()
       NateUtils.print_slow("Commited")
     else:
@@ -55,6 +54,8 @@ while True:
   if "gtin|" in command:
     commandList = command.split("|")
     GTIN = commandList[1]
+    if len(GTIN) == 7:
+      GTIN = GTIN + str(makeChecksum(GTIN))
     f = open("products.txt","r")
     for line in f.readlines():
       if GTIN in line.strip("[']\n"):
