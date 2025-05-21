@@ -26,6 +26,9 @@ def checkChecksum(In):
   else:
     return False
 
+cost = 0
+cart = []
+
 while True:
   command = input("> ")
   command = command.lower()
@@ -61,6 +64,10 @@ while True:
         NateUtils.print_slow(line.strip("[']\n"))
     f.close()
     
+  elif "clearcart|" in command:
+    cart = []
+    cost = 0
+  
   elif "cart|" in command:
     commandList = command.split("|")
     GTIN = commandList[1]
@@ -69,6 +76,22 @@ while True:
     f = open("products.txt","r")
     for line in f.readlines():
       if GTIN in line.strip("[']\n"):
-        line.strip("[']\n").split("|")
-        print(line[2])
+        line = line.strip("[']\n")
+        line = line.split("|")
+        cost += float(line[2])
+        cart += GTIN
+        NateUtils.print_slow("Found a match, added to cart")
+    f.close()
+  
+  elif "checkout|" in command:
+    commandList = command.split("|")
+    f = open("products.txt","r")
+    for GTIN in cart:
+      for line in f.readlines():
+        if GTIN in line.strip("[']\n"):
+          line = line.strip("[']\n")
+          NateUtils.print_slow(line)
+    NateUtils.print_slow(f'Your total is {cost}, thank you for coming!')
+    cart = []
+    cost = 0
     f.close()
