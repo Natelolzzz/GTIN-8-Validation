@@ -41,7 +41,7 @@ while True:
       GTIN = GTIN + str(makeChecksum(GTIN))
     if checkChecksum(GTIN):
       f = open("products.txt","a")
-      f.write(f'{GTIN}|{name}|{cost}\n')
+      f.write(f"{GTIN}|{name}|{cost}\n")
       f.close()
       NateUtils.print_slow("Commited")
     else:
@@ -67,10 +67,25 @@ while True:
   elif "clearcart|" in command:
     cart = []
     cost = 0
+    
+  elif "listcart|" in command:
+    for i in range(len(cart)):
+      f = open("products.txt","r")
+      for line in f.readlines():
+        if cart[i][0] in line.strip("[']\n"):
+          line = line.strip("[']\n")
+          line += "|"
+          line += str(cart[i][1])
+          NateUtils.print_slow(line)
+      f.close()
   
   elif "cart|" in command:
     commandList = command.split("|")
     GTIN = commandList[1]
+    if len(commandList) > 2:
+      times = int(commandList[2])
+    else: 
+      times = 1
     if len(GTIN) == 7:
       GTIN = GTIN + str(makeChecksum(GTIN))
     f = open("products.txt","r")
@@ -78,20 +93,29 @@ while True:
       if GTIN in line.strip("[']\n"):
         line = line.strip("[']\n")
         line = line.split("|")
-        cost += float(line[2])
-        cart += GTIN
+        found = False
+        for i in range(len(cart)):
+          if GTIN in cart[i][0]:
+            cart[i][1] = str(int(cart[i][1]) + times)
+            cost += float(line[2])*times
+            found = True
+        if found == False:    
+          cost += float(line[2])*times
+          cart.append([GTIN,times])
         NateUtils.print_slow("Found a match, added to cart")
     f.close()
   
   elif "checkout|" in command:
     commandList = command.split("|")
-    f = open("products.txt","r")
-    for GTIN in cart:
+    for i in range(len(cart)):
+      f = open("products.txt","r")
       for line in f.readlines():
-        if GTIN in line.strip("[']\n"):
+        if cart[i][0] in line.strip("[']\n"):
           line = line.strip("[']\n")
+          line += "|"
+          line += str(cart[i][1])
           NateUtils.print_slow(line)
-    NateUtils.print_slow(f'Your total is {cost}, thank you for coming!')
+      f.close()
+    NateUtils.print_slow(f"Your total is {cost}, thank you for coming!")
     cart = []
     cost = 0
-    f.close()
