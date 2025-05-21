@@ -44,7 +44,7 @@ while True:
       f.write(f"{GTIN}|{name}|{cost}\n")
       f.close()
       NateUtils.print_slow("Commited")
-    else:
+    else: 
       NateUtils.print_slow("Failed GTIN Check")
 
   if "list|" in command:
@@ -73,6 +73,9 @@ while True:
       f = open("products.txt","r")
       for line in f.readlines():
         if cart[i][0] in line.strip("[']\n"):
+          line = line.split("|")
+          line[3] = ""
+          line = str(line)
           line = line.strip("[']\n")
           line += "|"
           line += str(cart[i][1])
@@ -94,15 +97,37 @@ while True:
         line = line.strip("[']\n")
         line = line.split("|")
         found = False
+        
+        if 0 == int(line[3]):
+          NateUtils.print_slow("Out of stock")
+          break
+        
+        NateUtils.print_slow("Found a match, added to cart")
+        
         for i in range(len(cart)):
           if GTIN in cart[i][0]:
+            if times+1 > int(line[3]):
+              times = int(line[3])
+              NateUtils.print_slow("Warning, this is now out of stock")
             cart[i][1] = str(int(cart[i][1]) + times)
             cost += float(line[2])*times
             found = True
         if found == False:    
           cost += float(line[2])*times
           cart.append([GTIN,times])
-        NateUtils.print_slow("Found a match, added to cart")
+        
+        f.close()
+        with open("products.txt", "r") as f:
+          lines = f.readlines()
+        with open("products.txt", "w") as f:
+          for imported in lines:
+            if imported.strip("\n") != line:
+              f.write(imported)
+        f = open("products.txt","w")
+        newStock = int(line[3]) - times
+        f.write(f"{line[0]}|{line[1]}|{line[2]}|{newStock}")
+        f.close()
+        
     f.close()
   
   elif "checkout|" in command:
