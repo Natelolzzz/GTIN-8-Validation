@@ -34,12 +34,11 @@ while True:
     GTIN = commandList[1]
     name = commandList[2]
     cost = commandList[3]
-    stock = commandList[4]
     if len(GTIN) == 7:
       GTIN = GTIN + str(makeChecksum(GTIN))
     if checkChecksum(GTIN):
       f = open("products.txt","a")
-      f.write(f'{GTIN}|{name}|{cost}|{stock}\n')
+      f.write(f'{GTIN}|{name}|{cost}\n')
       f.close()
       NateUtils.print_slow("Commited")
     else:
@@ -51,7 +50,7 @@ while True:
       NateUtils.print_slow(line.strip("[']\n"))
     f.close()
 
-  if "gtin|" in command:
+  elif "gtin|" in command:
     commandList = command.split("|")
     GTIN = commandList[1]
     if len(GTIN) == 7:
@@ -60,4 +59,16 @@ while True:
     for line in f.readlines():
       if GTIN in line.strip("[']\n"):
         NateUtils.print_slow(line.strip("[']\n"))
+    f.close()
+    
+  elif "cart|" in command:
+    commandList = command.split("|")
+    GTIN = commandList[1]
+    if len(GTIN) == 7:
+      GTIN = GTIN + str(makeChecksum(GTIN))
+    f = open("products.txt","r")
+    for line in f.readlines():
+      if GTIN in line.strip("[']\n"):
+        line.strip("[']\n").split("|")
+        print(line[2])
     f.close()
